@@ -22,7 +22,6 @@ env/
 checkpoints/
 runs/
 wandb/
-*.npz
 
 # OS
 .DS_Store
@@ -30,3 +29,7 @@ Thumbs.db
 
 # Pixi
 .pixi/
+pixi.lock
+
+# Pytest
+.pytest_cache/

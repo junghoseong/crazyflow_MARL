@@ -3,26 +3,178 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "crazyflow-marl"
-version = "0.1.0"
-description = "Multi-Agent Reinforcement Learning for Crazyflow drone environments."
-requires-python = ">=3.11"
+name = "crazyflow"
+dynamic = ["version"]
+description = "Fast, parallelizable simulations of drones with JAX and MuJoCo."
+authors = [{ name = "Martin Schuck" }, { name = "Marcel Rath" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+]
 
 dependencies = [
-    "crazyflow",
-    "jax>=0.7.0",
-    "flax",
-    "optax",
     "numpy>=2.0.0",
-    "gymnasium>=1.2.0",
+    "scipy>=1.17.0",
+    "jax>=0.7.0",        # 0.5.3 and 0.6.0 have a bug that causes resets to not work properly.
+    "mujoco>=3.3.0",
+    "mujoco-mjx>=3.3.0",
+    "gymnasium[mujoco]>=1.2.0",
+    "imageio",
+    "einops",
+    "flax",
+    "ml_collections",
+    "casadi",
+    "drone-models==0.1.0",             # from PyPI (regular install) or submodules folder (pixi install)
+    "drone-controllers==0.1.0",        # from PyPI (regular install) or submodules folder (pixi install)
 ]
+requires-python = ">=3.11,<3.14" # MuJoCo has no wheels for python 14
 
 [project.optional-dependencies]
 gpu = ["jax[cuda12]"]
-wandb = ["wandb"]
+benchmark = ["fire", "matplotlib", "pandas"]
+
+[project.urls]
+Homepage = "https://github.com/utiasDSL/crazyflow"
+Repository = "https://github.com/utiasDSL/crazyflow"
+
+[tool.setuptools.packages]
+find = {include = ["crazyflow*"]}
+
+[tool.setuptools.dynamic]
+version = { attr = "crazyflow.__version__" }
+
+[tool.setuptools.package-data]
+crazyflow = ["scene.xml"]
+
+[tool.pytest.ini_options]
+markers = ["unit", "integration", "render"]
+addopts = "-m 'not render'"
 
 [tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".git",
+    ".git-rewrite",
+    ".ipynb_checkpoints",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+    "site-packages",
+    "venv",
+    "docs/conf.py",
+]
+
 line-length = 100
+indent-width = 4
+target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
+select = ["E", "F", "I", "D", "TCH", "ANN"]
+ignore = ["ANN401"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]  # Prevent ruff from reporting conflicting settings with isort
+split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"benchmark/*" = ["D100", "D103"]
+"tests/*" = ["D100", "D103", "D104"]
+"examples/*" = ["D100", "D103"]
+"tutorials/*" = ["D", "ANN"]
+# TODO: Remove once everything is stable and document
+"crazyflow/*" = ["D100", "D101", "D102", "D104", "D107"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-annotations]
+suppress-dummy-args = true
+suppress-none-returning = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = true
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.pixi]
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64"]
+
+[tool.pixi.dependencies]
+pip = "*"
+ruff = "*"
+
+[tool.pixi.pypi-dependencies]
+crazyflow = { path = "./", editable = true }
+drone-models = { path = "./submodules/drone-models", editable = true }
+drone-controllers = { path = "./submodules/drone-controllers", editable = true }
+
+[tool.pixi.feature.gpu]
+platforms = ["linux-64"]
+
+[tool.pixi.feature.build.pypi-dependencies]
+build = ">=1.3"
+twine = ">=6.0"
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+tests = { features = ["tests"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+release = { features = ["build"], solve-group = "default" }
+# GPU environments do not work on osx-arm64 
+gpu = { features = ["gpu"], solve-group = "gpu" }
+benchmark = { features = ["benchmark", "gpu"], solve-group = "gpu" }
+gpu-tests = { features = ["tests", "gpu"], solve-group = "gpu" }
+dist = { features = ["dist"], solve-group = "default" }
+
+[tool.pixi.feature.tests.dependencies]
+pytest = ">=8.4.1"
+pytest-timeout = ">=2.1.0"
+array-api-strict = ">=2.4.1"
+matplotlib = "*"
+
+[tool.pixi.feature.tests.tasks]
+tests = { cmd = "pytest -v tests", description = "Run tests" }
+
+[tool.pixi.feature.docs.dependencies]
+python = ">=3.10"
+mkdocs = ">=1.5.0"
+mkdocs-material = ">=9.0.0"
+
+[tool.pixi.feature.docs.pypi-dependencies]
+mkdocs-autorefs = ">=1.2.0"
+mkdocstrings = { extras = ["python"], version = ">=0.26.0" }
+mkdocs-gen-files = ">=0.5.0"
+mkdocs-literate-nav = ">=0.6.0"
+mkdocs-section-index = ">=0.3.0"
+
+[tool.pixi.feature.docs.tasks]
+docs-build = { cmd = "mkdocs build", description = "Build docs" }
+docs-serve = { cmd = "mkdocs serve --livereload", description = "Serve docs locally" }
+
+[tool.pixi.feature.dist.pypi-dependencies]
+build = "*"
+twine = "*"
+
+[tool.pixi.feature.dist.tasks]
+build = { cmd = "python -m build && twine check dist/*", description = "Build and test the package" }
+upload_test = { cmd = "twine upload -r testpypi dist/*", description = "Test upload of the built package" }
+upload = { cmd = "twine upload dist/*", description = "Upload of the built package" }

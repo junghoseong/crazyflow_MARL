@@ -1,0 +1,127 @@
+site_name: Drone Models
+site_description: Models of quadrotor drones for estimation and control tasks
+site_url: https://utiasdsl.github.io/drone-models/
+repo_url: https://github.com/utiasDSL/drone-models
+repo_name: utiasDSL/drone-models
+
+theme:
+  name: material
+  logo: img/logo_white.png
+  favicon: img/logo.png
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: true
+            docstring_style: google
+            merge_init_into_class: true
+            show_submodules: false
+            show_attribute_values: false
+
+nav:
+  - Home: index.md
+  - Get Started:
+    - Installation: get-started/installation.md
+    - Quick Start: get-started/quick-start.md
+  - User Guide:
+    - Models: user-guide/models.md
+    - Parametrize: user-guide/parametrize.md
+    - Batching and Domain Randomization: user-guide/batching.md
+    - Symbolic Models: user-guide/symbolic.md
+    - System Identification: user-guide/system-identification.md
+    - Transform Utilities: user-guide/transforms.md
+  - Examples: examples/index.md
+  - API Reference:
+    - drone_models: reference/drone_models/index.md
+    - first_principles: reference/drone_models/first_principles/index.md
+    - so_rpy_rotor_drag: reference/drone_models/so_rpy_rotor_drag/index.md
+    - so_rpy_rotor: reference/drone_models/so_rpy_rotor/index.md
+    - so_rpy: reference/drone_models/so_rpy/index.md
+    - Core:
+      - core: reference/drone_models/core.md
+      - drones: reference/drone_models/drones.md
+      - symbols: reference/drone_models/symbols.md
+      - transform: reference/drone_models/transform.md
+    - Utilities:
+      - utils: reference/drone_models/utils/index.md
+      - utils.rotation: reference/drone_models/utils/rotation.md
+      - utils.data_utils: reference/drone_models/utils/data_utils.md
+      - utils.identification: reference/drone_models/utils/identification.md
+  - Cite: cite.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+watch:
+  - drone_models/
