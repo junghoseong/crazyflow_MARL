@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Training artifacts
+checkpoints/
+runs/
+wandb/
+*.npz
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pixi
+.pixi/

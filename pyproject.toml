@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crazyflow-marl"
+version = "0.1.0"
+description = "Multi-Agent Reinforcement Learning for Crazyflow drone environments."
+requires-python = ">=3.11"
+
+dependencies = [
+    "crazyflow",
+    "jax>=0.7.0",
+    "flax",
+    "optax",
+    "numpy>=2.0.0",
+    "gymnasium>=1.2.0",
+]
+
+[project.optional-dependencies]
+gpu = ["jax[cuda12]"]
+wandb = ["wandb"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
